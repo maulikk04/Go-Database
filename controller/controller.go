@@ -35,7 +35,6 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ReadHandler(w http.ResponseWriter, r *http.Request) {
-
 	params := mux.Vars(r)
 	id := params["id"]
 
@@ -54,13 +53,48 @@ func ReadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ReadAllHandler(w http.ResponseWriter, r *http.Request) {
-
 	data, err := db.ReadAll("users")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	json.NewEncoder(w).Encode(data)
+}
+
+func UpdateHandler(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	id := params["id"]
+
+	if id == "" {
+		http.Error(w, "Missing id", http.StatusBadRequest)
+		return
+	}
+
+	var updateData map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&updateData); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	existingData, err := db.Read("users", id)
+	if err != nil {
+		http.Error(w, "Record not found", http.StatusNotFound)
+		return
+	}
+
+	for key, value := range updateData {
+		existingData[key] = value
+	}
+
+	existingData["id"] = id
+
+	if err := db.Write("users", id, existingData); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(existingData)
 }
 
 func DeleteHandler(w http.ResponseWriter, r *http.Request) {
@@ -78,5 +112,4 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-
 }

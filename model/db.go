@@ -52,7 +52,6 @@ func New(dir string, options *Options) (*Driver, error) {
 
 	opts.Logger.Debug("Creating database at '%s'..\n", dir)
 	return &driver, os.MkdirAll(dir, 0755)
-
 }
 
 func (d *Driver) Write(collection, id string, v map[string]interface{}) error {
@@ -111,7 +110,6 @@ func (d *Driver) Read(collection, id string) (map[string]interface{}, error) {
 }
 
 func (d *Driver) ReadAll(collection string) ([]map[string]interface{}, error) {
-
 	if collection == "" {
 		return nil, fmt.Errorf("missing collection - unable to read")
 	}
@@ -156,7 +154,6 @@ func (d *Driver) Delete(collection, id string) error {
 		return os.RemoveAll(dir)
 	case fi.Mode().IsRegular():
 		return os.RemoveAll(dir + ".json")
-
 	}
 	return nil
 }

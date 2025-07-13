@@ -10,6 +10,7 @@ func SetupRouter() *mux.Router {
 	r.HandleFunc("/create", controller.CreateHandler).Methods("POST")
 	r.HandleFunc("/read/{id}", controller.ReadHandler).Methods("GET")
 	r.HandleFunc("/readall", controller.ReadAllHandler).Methods("GET")
+	r.HandleFunc("/update/{id}", controller.UpdateHandler).Methods("PUT")
 	r.HandleFunc("/delete/{id}", controller.DeleteHandler).Methods("DELETE")
 
 	return r
